@@ -104,7 +104,7 @@ static const CGFloat kRTSpinKitViewDefaultSpinnerSize = 37.0;
 
 -(void)applyAnimation {
     // Remove any sublayer.
-    self.layer.sublayers = nil;
+    [self clearAnimation];
 
     CGSize size = CGSizeMake(self.spinnerSize, self.spinnerSize);
     NSObject<RTSpinKitAnimating> *animation = self.animator;
@@ -112,6 +112,16 @@ static const CGFloat kRTSpinKitViewDefaultSpinnerSize = 37.0;
         animation = RTSpinKitAnimationFromStyle(self.style);
     }
     [animation setupSpinKitAnimationInLayer:self.layer withSize:size color:self.color];
+}
+
+- (void)clearAnimation {
+    [self.layer removeAllAnimations];
+    
+    for (CALayer *layer in self.layer.sublayers) {
+        [layer removeFromSuperlayer];
+    }
+    
+    self.layer.sublayers = nil;
 }
 
 #pragma mark - Hooks
@@ -136,7 +146,8 @@ static const CGFloat kRTSpinKitViewDefaultSpinnerSize = 37.0;
     if (self.isStopped) {
         self.hidden = NO;
         self.stopped = NO;
-        [self resumeLayers];
+        
+        [self applyAnimation];
     }
 }
 
@@ -147,7 +158,8 @@ static const CGFloat kRTSpinKitViewDefaultSpinnerSize = 37.0;
         }
         
         self.stopped = YES;
-        [self pauseLayers];
+        
+        [self clearAnimation];
     }
 }
 
